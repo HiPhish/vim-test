@@ -33,7 +33,12 @@ function! test#java#gradletest#executable() abort
   " Prefer the local Gradle wrapper over the system-wide Gradle
   let l:executable = executable('./gradlew') == 1 ? './gradlew' : 'gradle'
   " Single-module project VS multi-module project
-  let l:target = isdirectory('src') ? 'test' : (':'..fnamemodify(expand('%'), ':.:s?\v/.*??')..':test')
+  let l:sub_module = fnamemodify(expand('%'), ':.:s?\v/.*??')
+  if l:sub_module =~? '\v\.java$' || l:sub_module == 'src'
+  	  let l:target = 'test'
+  else
+  	  let l:target = ':' . l:sub_module . ':test'
+  endif
   return printf('%s %s', l:executable, l:target)
 endfunction
 
