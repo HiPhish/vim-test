@@ -30,7 +30,11 @@ function! test#java#gradletest#build_args(args) abort
 endfunction
 
 function! test#java#gradletest#executable() abort
-  return 'gradle test'
+  " Prefer the local Gradle wrapper over the system-wide Gradle
+  let l:executable = executable('./gradlew') == 1 ? './gradlew' : 'gradle'
+  " Single-module project VS multi-module project
+  let l:target = isdirectory('src') ? 'test' : (':'..fnamemodify(expand('%'), ':.:s?\v/.*??')..':test')
+  return printf('%s %s', l:executable, l:target)
 endfunction
 
 function! s:nearest_test(position) abort
